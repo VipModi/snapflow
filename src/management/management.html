@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapFlow — Capture Library & Settings</title>
+  <link rel="stylesheet" href="management.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <img src="../../icons/icon32.png" alt="SnapFlow Logo" class="brand-icon">
+        <h1 class="brand-title">SnapFlow</h1>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Management Navigation">
+        <button id="navLibrary" class="nav-item active" data-tab="library">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          <span>Capture Library</span>
+        </button>
+        <button id="navSettings" class="nav-item" data-tab="settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Preferences</span>
+        </button>
+        <button id="navShortcuts" class="nav-item" data-tab="shortcuts">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+            <path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M8 12h.001M12 12h.001M16 12h.001M7 16h10"></path>
+          </svg>
+          <span>Shortcuts</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span class="privacy-badge">100% On-Device • Zero Telemetry</span>
+        <span class="version-label">SnapFlow v0.1.0</span>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Tab: Capture Library -->
+      <section id="tabLibrary" class="tab-pane active">
+        <header class="pane-header">
+          <div>
+            <h2 class="pane-title">Capture Library</h2>
+            <p class="pane-desc">Index of screenshots, GIFs, and recordings saved to your local Downloads folder.</p>
+          </div>
+          <button id="btnRefreshLibrary" class="btn btn-outline" title="Refresh library index">
+            <span>Refresh</span>
+          </button>
+        </header>
+
+        <!-- Library Table Container -->
+        <div class="card table-card">
+          <table class="data-table" id="capturesTable">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Filename</th>
+                <th>Date & Time</th>
+                <th>File Size</th>
+                <th>Destination</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="capturesListBody">
+              <!-- Populated via JS -->
+            </tbody>
+          </table>
+          <div id="emptyLibraryState" class="empty-state hidden">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            <p class="empty-title">No captures recorded yet</p>
+            <p class="empty-desc">Open the SnapFlow extension popup or press <code>Ctrl+Shift+S</code> to take your first screenshot.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Settings / Preferences -->
+      <section id="tabSettings" class="tab-pane hidden">
+        <header class="pane-header">
+          <div>
+            <h2 class="pane-title">Preferences</h2>
+            <p class="pane-desc">Configure image capture formats and storage defaults.</p>
+          </div>
+        </header>
+
+        <div class="settings-grid">
+          <!-- Screenshot Settings Card -->
+          <div class="card settings-card">
+            <h3 class="card-title">Screenshot Settings</h3>
+            <div class="form-group">
+              <label for="settingImageFormat" class="form-label">Default Image Format</label>
+              <select id="settingImageFormat" class="form-select">
+                <option value="png">PNG (Lossless, Default)</option>
+                <option value="jpeg">JPEG (Compressed)</option>
+              </select>
+              <p class="form-hint">PNG preserves pixel-exact webpage details. JPEG creates smaller files.</p>
+            </div>
+
+            <div id="jpegQualityGroup" class="form-group hidden">
+              <label for="settingJpegQuality" class="form-label">JPEG Quality (<span id="jpegQualityVal">90</span>%)</label>
+              <input type="range" id="settingJpegQuality" min="50" max="100" value="90" class="form-range">
+            </div>
+          </div>
+
+          <!-- Storage & Google Drive Settings Card -->
+          <div class="card settings-card">
+            <h3 class="card-title">Storage & Google Drive</h3>
+            <div class="form-group">
+              <label class="form-label">Storage Location</label>
+              <p class="form-static">Chrome Downloads Folder (Local Filesystem)</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Google Drive Status</label>
+              <div class="drive-status-box">
+                <span class="status-indicator-offline"></span>
+                <span class="drive-status-text">Not Connected (₹0 cost baseline)</span>
+              </div>
+              <p class="form-hint">Per-capture upload prompt can be configured once Drive connection is authorized.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab: Shortcuts Reference -->
+      <section id="tabShortcuts" class="tab-pane hidden">
+        <header class="pane-header">
+          <div>
+            <h2 class="pane-title">Keyboard Shortcuts</h2>
+            <p class="pane-desc">Quickly trigger capture actions without opening the popup.</p>
+          </div>
+          <button id="btnConfigureChromeShortcuts" class="btn btn-outline">
+            <span>Configure in Chrome</span>
+          </button>
+        </header>
+
+        <div class="card table-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th>Default Shortcut (Windows / Linux)</th>
+                <th>Default Shortcut (macOS)</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Capture Visible Viewport</strong></td>
+                <td><kbd>Ctrl+Shift+S</kbd></td>
+                <td><kbd>Command+Shift+S</kbd></td>
+                <td><span class="badge badge-active">Active</span></td>
+              </tr>
+              <tr>
+                <td><strong>Open SnapFlow Popup</strong></td>
+                <td><kbd>Ctrl+Shift+F</kbd></td>
+                <td><kbd>Command+Shift+F</kbd></td>
+                <td><span class="badge badge-active">Active</span></td>
+              </tr>
+              <tr>
+                <td><strong>Toggle Screen Recording</strong></td>
+                <td><kbd>Ctrl+Shift+R</kbd></td>
+                <td><kbd>Command+Shift+R</kbd></td>
+                <td><span class="badge badge-queued">Phase 3</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="management.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+# Dependencies & Build Output
+node_modules/
+dist/
+build/
+coverage/
+
+# Test data & runtime profiles
+test-user-data-dir/
+test-downloads/
+test-artifacts/
+*.log
+
+# Sensitive Credentials & Secrets (Lab Rule 26 & Confirmed Decision D-03)
+.env
+.env.*
+*.env
+client_secret*.json
+credentials*.json
+*.pem
+*.key
+*.token
+oauth_tokens.json
+secrets.json
+
+# Extension build/package artifacts
+*.crx
+*.zip
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp

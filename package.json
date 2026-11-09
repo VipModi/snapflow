@@ -1,0 +1,21 @@
+{
+  "name": "snapflow",
+  "version": "0.1.0",
+  "description": "Chrome Extension for screenshots, animated GIFs and screen recordings with local and Google Drive storage.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/unit/**/*.test.js",
+    "test:e2e": "node tests/integration/test-screenshot-e2e.js"
+  },
+  "keywords": [
+    "chrome-extension",
+    "screenshot",
+    "screen-recorder",
+    "screen-capture",
+    "gif",
+    "manifest-v3"
+  ],
+  "author": "Vipul",
+  "license": "MIT"
+}
