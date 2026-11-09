@@ -29,8 +29,10 @@ describe('Manifest V3 Compliance & Permissions', () => {
     assert.ok(manifest.permissions.includes('activeTab'), 'Must include activeTab');
     assert.ok(manifest.permissions.includes('downloads'), 'Must include downloads');
     assert.ok(manifest.permissions.includes('storage'), 'Must include storage');
+    assert.ok(manifest.permissions.includes('scripting'), 'Must include scripting');
     assert.ok(!manifest.permissions.includes('<all_urls>'), 'Must NOT request <all_urls>');
     assert.ok(!manifest.permissions.includes('*://*/*'), 'Must NOT request wildcard host permissions');
+    assert.ok(!manifest.host_permissions || manifest.host_permissions.length === 0, 'Must NOT have host_permissions');
   });
 
   it('does NOT request invalid "microphone" manifest permission (T-09)', () => {

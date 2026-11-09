@@ -47,8 +47,5 @@
       },
       "description": "Capture Visible Viewport Screenshot"
     }
-  },
-  "host_permissions": [
-    "<all_urls>"
-  ]
+  }
 }

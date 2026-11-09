@@ -8,6 +8,7 @@ import { generateFilename } from '../shared/formatters.js';
 import { getSettings, updateSettings } from '../storage/settings-store.js';
 import { saveCaptureMetadata } from '../storage/metadata-store.js';
 import { captureVisibleViewport, estimateDataUrlSize } from '../capture/screenshot.js';
+import { captureFullPage } from '../capture/full-page.js';
 
 // Initialize default settings on extension installation or update
 chrome.runtime.onInstalled.addListener(async (details) => {
@@ -21,7 +22,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
  * @param {Object} [customOptions={}]
  * @returns {Promise<{ success: boolean, filename: string, downloadId: number, dataUrl: string }>}
  */
-async function handleViewportCapture(customOptions = {}) {
+export async function handleViewportCapture(customOptions = {}) {
   const settings = await getSettings();
   const format = customOptions.format || settings.imageFormat || 'png';
   const quality = customOptions.quality || settings.jpegQuality || 90;
@@ -68,8 +69,39 @@ async function handleViewportCapture(customOptions = {}) {
   };
 }
 
+/**
+ * Handle full-page screenshot capture and download
+ * @param {Object} [customOptions={}]
+ * @returns {Promise<{ success: boolean, filename: string, downloadId: number, width: number, height: number, dataUrl: string }>}
+ */
+export async function handleFullPageCapture(customOptions = {}) {
+  const allTabs = await chrome.tabs.query({});
+  const tab = allTabs.find(t => t.active && !t.url?.includes('chrome-extension://')) ||
+              allTabs.find(t => !t.url?.includes('chrome-extension://')) ||
+              allTabs[0];
+  if (!tab) throw new Error('No target tab found for full-page capture');
+
+  if (!tab.active) {
+    await chrome.tabs.update(tab.id, { active: true });
+    await new Promise(r => setTimeout(r, 150));
+  }
+
+  const settings = await getSettings();
+  const format = customOptions.format || settings.imageFormat || 'png';
+  const quality = customOptions.quality || settings.jpegQuality || 90;
+
+  const result = await captureFullPage(tab, { format, quality });
+  return { success: true, ...result };
+}
+
+// Attach to globalThis for internal coordination and test harnesses
+globalThis.handleViewportCapture = handleViewportCapture;
+globalThis.handleFullPageCapture = handleFullPageCapture;
+console.log('[SnapFlow ServiceWorker] Attached handlers to globalThis:', typeof globalThis.handleFullPageCapture);
+
 // Runtime message listener
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log('[SnapFlow ServiceWorker] onMessage received:', JSON.stringify(message));
   if (!message || !message.action) return false;
 
   switch (message.action) {
@@ -77,10 +109,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       handleViewportCapture(message.options)
         .then(result => sendResponse(result))
         .catch(err => {
-          console.error('[SnapFlow ServiceWorker] Capture error:', err);
+          console.error('[SnapFlow ServiceWorker] Viewport capture error:', err);
           sendResponse({ success: false, error: err.message });
         });
       return true; // Keep message channel open for async response
+
+    case ACTIONS.CAPTURE_FULLPAGE:
+      handleFullPageCapture(message.options)
+        .then(result => sendResponse(result))
+        .catch(err => {
+          console.error('[SnapFlow ServiceWorker] Full page capture error:', err);
+          sendResponse({ success: false, error: err.message });
+        });
+      return true;
 
     case ACTIONS.OPEN_MANAGEMENT:
       chrome.runtime.openOptionsPage(() => {

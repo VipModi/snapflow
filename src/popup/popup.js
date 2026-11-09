@@ -8,6 +8,7 @@ import { getSettings, updateSettings } from '../storage/settings-store.js';
 
 // DOM Element references
 const btnCaptureViewport = document.getElementById('btnCaptureViewport');
+const btnCaptureFullPage = document.getElementById('btnCaptureFullPage');
 const btnCopyClipboard = document.getElementById('btnCopyClipboard');
 const btnOpenManagement = document.getElementById('btnOpenManagement');
 const btnViewLibrary = document.getElementById('btnViewLibrary');
@@ -112,7 +113,45 @@ btnCaptureViewport.addEventListener('click', async () => {
   }
 });
 
-// 3. Handle Copy to Clipboard (D-16 / SF-FR-007)
+// 3. Handle Full-Page Screenshot (Phase 2 Milestone)
+if (btnCaptureFullPage) {
+  btnCaptureFullPage.addEventListener('click', async () => {
+    const format = getSelectedFormat();
+    showStatus('loading', 'Scrolling and stitching full page...');
+    btnCaptureViewport.disabled = true;
+    btnCaptureFullPage.disabled = true;
+
+    try {
+      console.log('[SnapFlow Popup] Sending CAPTURE_FULLPAGE message...');
+      const response = await chrome.runtime.sendMessage({
+        action: ACTIONS.CAPTURE_FULLPAGE,
+        options: { format }
+      });
+      console.log('[SnapFlow Popup] Received response:', JSON.stringify(response));
+      window.__lastCaptureResponse = response;
+
+      if (response && response.success) {
+        showStatus('success', `Saved ${response.filename} (${response.width}x${response.height}px)`);
+        setTimeout(() => {
+          btnCaptureViewport.disabled = false;
+          btnCaptureFullPage.disabled = false;
+        }, 800);
+      } else {
+        const errorMsg = response?.error || 'Full-page capture failed';
+        showStatus('error', errorMsg);
+        btnCaptureViewport.disabled = false;
+        btnCaptureFullPage.disabled = false;
+      }
+    } catch (err) {
+      console.error('[SnapFlow Popup] Full page error:', err);
+      showStatus('error', err.message || 'Error communicating with extension worker');
+      btnCaptureViewport.disabled = false;
+      btnCaptureFullPage.disabled = false;
+    }
+  });
+}
+
+// 4. Handle Copy to Clipboard (D-16 / SF-FR-007)
 btnCopyClipboard.addEventListener('click', async () => {
   showStatus('loading', 'Capturing tab for clipboard...');
   btnCopyClipboard.disabled = true;

@@ -34,6 +34,7 @@ async function runE2E() {
   console.log('--- Step 1: Prepare directories ---');
   if (fs.existsSync(DOWNLOADS_DIR)) fs.rmSync(DOWNLOADS_DIR, { recursive: true, force: true });
   fs.mkdirSync(DOWNLOADS_DIR, { recursive: true });
+  if (fs.existsSync(USER_DIR)) fs.rmSync(USER_DIR, { recursive: true, force: true });
 
   console.log('--- Step 2: Spawning Chrome with remote debugging ---');
   const chromeProc = spawn(CHROME_PATH, [
@@ -91,20 +92,37 @@ async function runE2E() {
     const extensionId = loadResult.result.id;
     console.log('✓ SnapFlow loaded with ID:', extensionId);
 
-    // Open popup.html as a page target
-    console.log('--- Step 4: Opening SnapFlow Popup target ---');
-    const popupTargetRes = await send(browserWs, 'Target.createTarget', {
-      url: `chrome-extension://${extensionId}/src/popup/popup.html`
+    // Enable tab target discovery
+    await send(browserWs, 'Target.setAutoAttach', {
+      autoAttach: true,
+      waitForDebuggerOnStart: false,
+      flatten: true,
+      filter: [{}]
     });
-    const popupTargetId = popupTargetRes.result.targetId;
-    console.log('✓ Popup target created:', popupTargetId);
+    await send(browserWs, 'Target.setDiscoverTargets', {
+      discover: true,
+      filter: [{}]
+    });
+    await sleep(600);
 
-    await sleep(1000);
+    // Find tab target for example.com
+    const targetList = await send(browserWs, 'Target.getTargets');
+    const tabTarget = targetList.result.targetInfos.find(t => t.type === 'tab');
+    if (!tabTarget) throw new Error('Tab target not found');
+    console.log('✓ Found Tab target:', tabTarget.targetId, tabTarget.url);
+
+    // Step 4: Trigger action on tab target (simulating user clicking extension icon on tab)
+    console.log('--- Step 4: Simulating Extension Action Trigger on Tab Target ---');
+    await send(browserWs, 'Extensions.triggerAction', {
+      id: extensionId,
+      targetId: tabTarget.targetId
+    });
+    await sleep(800);
 
     const targets = await (await fetch(`http://127.0.0.1:${DEBUG_PORT}/json/list`)).json();
     const popupTarget = targets.find(t => t.url && t.url.includes('popup.html'));
     if (!popupTarget) throw new Error('Popup target not found in target list');
-    console.log('✓ Connecting to Popup WebSocket:', popupTarget.webSocketDebuggerUrl);
+    console.log('✓ Connecting to Popup WebSocket with activeTab privilege:', popupTarget.webSocketDebuggerUrl);
 
     const popupWs = new WebSocket(popupTarget.webSocketDebuggerUrl);
     await new Promise(r => popupWs.onopen = r);

@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "test": "node --test tests/unit/**/*.test.js",
-    "test:e2e": "node tests/integration/test-screenshot-e2e.js"
+    "test:e2e": "node tests/integration/test-screenshot-e2e.js",
+    "test:fullpage": "node tests/integration/test-fullpage-e2e.js"
   },
   "keywords": [
     "chrome-extension",
